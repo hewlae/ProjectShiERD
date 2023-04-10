@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/data0/juyoung/swmm5.2/src/main.c
+string.h
+-
+stdio.h
+-
+time.h
+-
+swmm5.h
+/data0/juyoung/swmm5.2/src/swmm5.h
+
+/data0/juyoung/swmm5.2/src/swmm5.h
+

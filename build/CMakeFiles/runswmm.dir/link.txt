@@ -1,0 +1,1 @@
+/usr/bin/cc  -fopenmp   CMakeFiles/runswmm.dir/src/main.c.o  -o runswmm -Wl,-rpath,"\$ORIGIN" libswmm5.so -lm 
