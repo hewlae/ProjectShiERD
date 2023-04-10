@@ -9,7 +9,7 @@ RUN apt install openmpi-bin libopenmpi-dev glibc-source -y
 COPY requirements.txt /
 RUN pip3 install -r requirements.txt
 # change uid/gid and username @ each environment
-RUN adduser -uid 1004 juyoung
+RUN adduser -uid 1001 juyoung
 RUN mkdir -p /home/juyoung/swmm521
 WORKDIR /home/juyoung/swmm521
 
