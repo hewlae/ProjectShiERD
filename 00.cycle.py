@@ -50,10 +50,6 @@ while date < end_date:
    if not existed:
       print('Ensemble SWMM run has a severe problem at '+analysis_date)
       sys.exit(0)
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 01.run_swmm.py @ {} takes time of '.format(analysis_date) + result[0])
-   start = end
    pass
 
    os.system(bin_dir+'/02.extract_obs.py '+analysis_date+' '+experiment+' '+ex_no)
@@ -65,10 +61,6 @@ while date < end_date:
    if not existed:
       print('H run has a severe problem at '+analysis_date)
       sys.exit(0)
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 02.extract_obs.py / 03.apply_H.py @ {} takes time of '.format(analysis_date) + result[0])
-   start = end
    pass
 
    os.system('mpirun -n '+str(npe)+' '+bin_dir+'/04.run_etkf.py '+analysis_date+' '+experiment+' '+ex_no)
@@ -85,10 +77,6 @@ while date < end_date:
    if not os.path.isfile(output_file):
       print('EnKF run has a severe problem at '+analysis_date)
       sys.exit(0)
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 04.run_etkf.py @ {} takes time of '.format(analysis_date) + result[0])
-   start = end
    pass
 
    os.system(bin_dir+'/05.rerun_swmm0.py '+analysis_date+' '+experiment+' '+ex_no)
@@ -97,10 +85,6 @@ while date < end_date:
       print('Deterministic SWMM run has a severe problem at '+analysis_date)
       sys.exit(0)
    os.system(bin_dir+'/06.apply_H0.py '+analysis_date+' '+experiment+' '+ex_no)
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 05.rerun_swmm0.py / 06.apply_H0.py @ {} takes time of '.format(analysis_date) + result[0])
-   start = end
 
    os.system('mpirun -n '+str(npe)+' '+bin_dir+'/07.make_ana.py '+forecast_date+' '+experiment+' '+ex_no)
    existed = True
@@ -113,6 +97,6 @@ while date < end_date:
    pass
    end = time.time()
    result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 07.make_ana.py @ {} takes time of '.format(analysis_date) + result[0])
+   print('running a ETKF cycle @ {} takes time of '.format(analysis_date) + result[0])
    start = end
    date += datetime.timedelta(minutes=cycle)
