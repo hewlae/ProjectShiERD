@@ -1,0 +1,6 @@
+swmm-api==0.4.15
+numpy
+scipy
+pandas
+mpi4py
+pyyaml
