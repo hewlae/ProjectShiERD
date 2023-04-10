@@ -130,7 +130,6 @@ os.chdir(work_dir)
 if myid == 0 and not os.path.isdir(reanalysis_dir): 
    os.system('mkdir -p '+reanalysis_dir)
    os.system('ln -s '+rainfall_dir+'/*.dat '+reanalysis_dir)
-   start = time.time()
 
 # Member
 nmember = 0
@@ -533,7 +532,3 @@ if myid == 0 and not (cold_start == 1 and analysis_date == start_date):
    state_file = reanalysis_dir+'/state'+'%8.8d'%0
    write_ana(state_file, -1, state)
 comm.Barrier()
-if myid == 0:
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 04.run_etkf.py @ id==0 takes time of ' + result[0])
