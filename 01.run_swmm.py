@@ -56,7 +56,6 @@ os.chdir(work_dir)
 if myid == 0 and not os.path.isdir(forecast_dir): 
    os.system('mkdir -p '+forecast_dir)
    os.system('ln -s '+rainfall_dir+'/*.dat '+forecast_dir)
-   start = time.time()
 comm.Barrier()
 
 # Member
@@ -172,7 +171,3 @@ for i in range(nprocessor):
    os.chdir(current_dir)
    #os.system('rm -rf '+work_dir)
 comm.Barrier()
-if myid == 0:
-   end = time.time()
-   result = str(datetime.timedelta(seconds=(end-start))).split(".")
-   print('running 01.run_swmm.py @ id==0 takes time of ' + result[0])
