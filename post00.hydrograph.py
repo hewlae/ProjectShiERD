@@ -96,10 +96,11 @@ for rg in rain_gage:
     # df = pd.DataFrame({'time_series':rain_series, rg:rain_obs})
     series = pd.Series(rain_obs, index=rain_series)
     df[rg] = series
-    if rain_df.empty:
-        rain_df = rain_df.append(df)
-    else:
-        rain_df = pd.concat([rain_df, df], axis=1)
+    rain_df = pd.concat([rain_df, df], axis=1)
+    # if rain_df.empty:
+    #     rain_df = rain_df.append(df)
+    # else:
+    #     rain_df = pd.concat([rain_df, df], axis=1)
 rain_df = rain_df.resample('15min').sum() 
 print(rain_df.index)
 
