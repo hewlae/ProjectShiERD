@@ -4,3 +4,5 @@ scipy
 pandas
 mpi4py
 pyyaml
+seaborn
+matplotlib
