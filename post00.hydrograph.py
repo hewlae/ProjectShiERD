@@ -130,7 +130,7 @@ for wg,pp in wg_dic.items():
     ax2 = ax1.twinx()
     sns.lineplot(x = rain_df.index, y= "rg5425", data = rain_df, color="blue", ax=ax2)
     ax2.fill_between(rain_df.index, 0, rain_df["rg5425"],alpha = 0.8)
-    ax2.set(ylim=(0, 30))
+    ax2.set(ylim=(0, 20))
     ax2.set_ylabel("Rainfall [mm]", fontsize = '15')
     ax2.invert_yaxis()
     ax1.legend(labels=wg, loc = 5, fontsize = '15') 
