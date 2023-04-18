@@ -379,11 +379,11 @@ src[:,:] = Y[:,:,-1]
 comm.Allreduce(src, bufr, MPI.SUM)
 Y[:,:,-1] = bufr/(nmember0-1)
 # Quality control
-src[:,:] = sum(Y[:,:,:-1]**2,axis=2)
-comm.Allreduce(src, bufr, MPI.SUM)
-bufr[:,:] = bufr/(nmember0-1)-Y[:,:,-1]**2 # forecast error variance
-invalid = abs(y0-Y[:,:,-1]) > qcthreshold*sqrt(bufr+herror**2)
-y0[invalid] = -9999.
+# src[:,:] = sum(Y[:,:,:-1]**2,axis=2)
+# comm.Allreduce(src, bufr, MPI.SUM)
+# bufr[:,:] = bufr/(nmember0-1)-Y[:,:,-1]**2 # forecast error variance
+# invalid = abs(y0-Y[:,:,-1]) > qcthreshold*sqrt(bufr+herror**2)
+# y0[invalid] = -9999.
 # Perturbations
 for imember in range(nmember):
    Y[:,:,imember] -= Y[:,:,-1]
