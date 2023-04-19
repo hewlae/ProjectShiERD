@@ -170,6 +170,7 @@ for imember in range(nmember):
       inp = read_inp_file(input_file)
       hsf = read_hst_file(state_file, inp)
       print(hsf.storages_frame.depth)
+   else: pass
 
    # Write output
   # print('running SWMM at {}'.format(input_file))
