@@ -3,6 +3,7 @@ import sys, os, shutil, time, datetime, re, yaml
 from numpy import *
 from mpi4py import MPI
 from swmm_api import read_inp_file
+from swmm_api import read_hst_file
 from swmm_api.input_file.section_labels import OPTIONS, FILES, SUBCATCHMENTS, SUBAREAS, INFILTRATION, CONDUITS # TIMESERIES,
 
 class Parameter:
