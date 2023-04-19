@@ -127,6 +127,7 @@ for imember in range(nmember):
    state_file = analysis_dir+'/pert'+member[imember]
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
+   # print(hsf.storages_frame.depth)
    #print(hsf.subcatchments_frame)
    #print(hsf.nodes_frame)
    #print(hsf.links_frame)
@@ -149,6 +150,8 @@ if myid == 0:
    state_file = analysis_dir+'/state'+'%8.8d'%0
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
+   print('at 07.make_ana at id = 0')
+   print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values
