@@ -136,7 +136,7 @@ for wg,pp in wg_dic.items():
     ax1.legend(labels=wg, loc = 5, fontsize = '15') 
     plot_simgraph(0, 'red', 2) # ensemble mean
     sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
-    ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
+    ax1.legend(labels=['simulation', 'rainfall','observation'], loc = 5, fontsize = '15')
     ax1.set(ylim=(0, obsflow[wg].max()+0.8))
     ax1.set_ylabel("W.L : {} [m]".format(wg), fontsize = '15')
     for imember in range(nmember):
