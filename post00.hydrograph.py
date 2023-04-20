@@ -143,6 +143,6 @@ for wg,pp in wg_dic.items():
         plot_simgraph(imember, 'grey', 1)
     sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
     plot_simgraph(0, 'red', 2) # ensemble mean
-    ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
+    # ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
     plt.savefig(graph_dir+'/{}.png'.format(wg))
     plt.clf()
