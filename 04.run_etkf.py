@@ -242,6 +242,7 @@ for i in range(1,nstate+1):
    elif state_control == 1:
       if name[:12] == 'Infiltration': used = False
       elif name[:7] == 'setting': used = False
+      elif name[:8] == 'hydraulic': used = False
       else: used = True
    elif state_control == 2:
       used = True
