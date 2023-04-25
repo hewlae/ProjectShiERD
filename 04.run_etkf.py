@@ -34,14 +34,14 @@ def write_ana(filename, imember, state):
          if state[i].kind != 'subcatchment': continue
          datum = struct.pack('1d', state[i].ana[j,imember])
          bin_file.write(datum)
-   for j in range(nstorage):
-      for i in range(nstate):
-         if state[i].kind != 'storage': continue
-         datum = struct.pack('1f', state[i].ana[j,imember])
-         bin_file.write(datum)
    for j in range(nnode):
       for i in range(nstate):
          if state[i].kind != 'node': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(nstorage):
+      for i in range(nstate):
+         if state[i].kind != 'storage': continue
          datum = struct.pack('1f', state[i].ana[j,imember])
          bin_file.write(datum)
    for j in range(nconduit):
@@ -62,14 +62,14 @@ def write_fcst(filename, imember, state):
          if state[i].kind != 'subcatchment': continue
          datum = struct.pack('1d', state[i].fcst[j,imember])
          bin_file.write(datum)
-   for j in range(nstorage):
-      for i in range(nstate):
-         if state[i].kind != 'storage': continue
-         datum = struct.pack('1f', state[i].fcst[j,imember])
-         bin_file.write(datum)
    for j in range(nnode):
       for i in range(nstate):
          if state[i].kind != 'node': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
+   for j in range(nstorage):
+      for i in range(nstate):
+         if state[i].kind != 'storage': continue
          datum = struct.pack('1f', state[i].fcst[j,imember])
          bin_file.write(datum)
    for j in range(nconduit):
