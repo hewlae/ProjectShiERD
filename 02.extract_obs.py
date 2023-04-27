@@ -65,7 +65,7 @@ for isite in range(nsite):
       delta = delta.days*24*60 + int(delta.seconds/60)
       itime = int(delta/interval)
       if tmp[-2] == 'False': tmp[-2] = None
-      else: obs[itime,isite] = float(tmp[-2])
+      else: obs[itime,isite] = 3.28 * float(tmp[-2])
 #      print(obssite[isite], date, obs[itime,isite])
    text_file.close()
 pass
