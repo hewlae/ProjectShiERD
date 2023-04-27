@@ -242,6 +242,7 @@ for i in range(1,nstate+1):
    elif state_control == 1:
       if name[:12] == 'Infiltration': used = False
       elif name[:7] == 'setting': used = False
+      elif name[:8] == 'hydraulic': used = False
       else: used = True
    elif state_control == 2:
       used = True
@@ -257,7 +258,7 @@ for i in range(1,nstate+1):
    elif kind == 'link':
       ana = zeros((nconduit,nmember+1))
       fcst = zeros((nconduit,nmember+1))
-   #print(name, kind, used)
+   # print(name, kind, used)
    state.append(State(name, kind, used, ana, fcst))
 pass
 
@@ -267,7 +268,7 @@ for imember in range(nmember):
    state_file = forecast_dir+'/state'+member[imember]
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
-   # print(hsf.storages_frame)
+   print(hsf.storages_frame.depth)
    # print(hsf.subcatchments_frame)
    # print(hsf.nodes_frame)
    # print(hsf.links_frame)
@@ -323,6 +324,8 @@ if myid == 0 and not (cold_start == 1 and analysis_date == start_date):
    state_file = analysis_dir+'/state'+'%8.8d'%0
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
+   print('at 04.run_etkf at id = 0')   
+   print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values

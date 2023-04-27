@@ -3,6 +3,7 @@ import sys, os, shutil, time, datetime, re, yaml
 from numpy import *
 from mpi4py import MPI
 from swmm_api import read_inp_file
+from swmm_api import read_hst_file
 from swmm_api.input_file.section_labels import OPTIONS, FILES, SUBCATCHMENTS, SUBAREAS, INFILTRATION, CONDUITS # TIMESERIES,
 
 class Parameter:
@@ -162,7 +163,15 @@ for imember in range(nmember):
       for i in range(nparameter):
          if parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
    inp.write_file(input_file)
-   
+   # to check
+   if not analysis_date == start_date:
+      input_file = forecast_dir+'/input'+member[imember]
+      state_file = analysis_dir+'/state'+member[imember]
+      inp = read_inp_file(input_file)
+      hsf = read_hst_file(state_file, inp)
+      print(hsf.storages_frame.depth)
+   else: pass
+
    # Write output
   # print('running SWMM at {}'.format(input_file))
    os.system(bin_file+' '+input_file+' output.txt '+output_file+' > output.log 2>&1')
