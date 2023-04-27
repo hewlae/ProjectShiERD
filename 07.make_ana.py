@@ -108,12 +108,12 @@ for i in range(1,nstate+1):
    if kind == 'subcatchment':
       ana = zeros((nsubcatchment,nmember+1)) # last one for the deterministic
       fcst = zeros((nsubcatchment,nmember+1))
-   elif kind == 'storage':
-      ana = zeros((nstorage,nmember+1))
-      fcst = zeros((nstorage,nmember+1))
    elif kind == 'node':
       ana = zeros((nnode,nmember+1))
       fcst = zeros((nnode,nmember+1))
+   elif kind == 'storage':
+      ana = zeros((nstorage,nmember+1))
+      fcst = zeros((nstorage,nmember+1))
    elif kind == 'link':
       ana = zeros((nconduit,nmember+1))
       fcst = zeros((nconduit,nmember+1))
@@ -127,17 +127,19 @@ for imember in range(nmember):
    state_file = analysis_dir+'/pert'+member[imember]
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
-   # print(hsf.storages_frame.depth)
+   #print(hsf.storages_frame.depth)
    #print(hsf.subcatchments_frame)
    #print(hsf.nodes_frame)
    #print(hsf.links_frame)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
-      elif state[i].kind == 'storage':
-         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
          state[i].ana[:,imember] = hsf.nodes_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'storage':
+         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+         # print('pert states @ {} '.format(analysis_date))
+         # print(state[i].name, state[i].ana)         
       elif state[i].kind == 'link':
          state[i].ana[:,imember] = hsf.links_frame.loc[:,state[i].name].values
 pass
@@ -150,15 +152,16 @@ if myid == 0:
    state_file = analysis_dir+'/state'+'%8.8d'%0
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
-   print('at 07.make_ana at id = 0')
-   print(hsf.storages_frame.depth)
+   # print('reanalysis results @ {}'.format(analysis_date))
+   # print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values
-      elif state[i].kind == 'storage':
-         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
          state[i].ana[:,-1] = hsf.nodes_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'storage':
+         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
+         # print(state[i].name, state[i].ana)
       elif state[i].kind == 'link':
          state[i].ana[:,-1] = hsf.links_frame.loc[:,state[i].name].values
 for i in range(nstate):
@@ -170,7 +173,18 @@ pass
 
 # Add perturbations and writeout
 for imember in range(nmember):
-   for i in range(nstate): state[i].ana[:,imember] += state[i].ana[:,-1]
+   for i in range(nstate): 
+      # if state[i].name == 'depth' and state[i].kind == 'storage': print(state[i].ana)
+      state[i].ana[:,imember] += state[i].ana[:,-1]
+      # if state[i].name == 'depth' and state[i].kind == 'storage': 
+      #    print('after update ...')
+      #    print(state[i].ana)
    state_file = analysis_dir+'/state'+member[imember]
    write_ana(state_file, imember, state)
+   # # to check
+   # input_file = forecast_dir+'/input'+'%8.8d'%0
+   # state_file = analysis_dir+'/state'+member[imember]
+   # inp = read_inp_file(input_file)
+   # hsf = read_hst_file(state_file, inp)
+   # print(hsf.storages_frame.depth)
 comm.Barrier()

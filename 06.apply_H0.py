@@ -54,7 +54,7 @@ for imember in range(nmember):
    # Read
    output_file = reanalysis_dir+'/output'+member[imember]
    out = read_out_file(output_file)
-   for isite in range(nsite): obs[:,isite] = out.get_part(OBJECTS.NODE, obssite[isite], VARIABLES.NODE.DEPTH).values[0:]
+   for isite in range(nsite): obs[:,isite] = 3.28 * out.get_part(OBJECTS.NODE, obssite[isite], VARIABLES.NODE.DEPTH).values[0:]
    # Write
    obs_file = reanalysis_dir+'/obs'+member[imember]
    text_file = open(obs_file, 'w')

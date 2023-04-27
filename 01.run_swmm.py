@@ -163,14 +163,14 @@ for imember in range(nmember):
       for i in range(nparameter):
          if parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
    inp.write_file(input_file)
-   # to check
-   if not analysis_date == start_date:
-      input_file = forecast_dir+'/input'+member[imember]
-      state_file = analysis_dir+'/state'+member[imember]
-      inp = read_inp_file(input_file)
-      hsf = read_hst_file(state_file, inp)
-      print(hsf.storages_frame.depth)
-   else: pass
+   # # to check
+   # if not analysis_date == start_date:
+   #    input_file = forecast_dir+'/input'+member[imember]
+   #    state_file = analysis_dir+'/state'+member[imember]
+   #    inp = read_inp_file(input_file)
+   #    hsf = read_hst_file(state_file, inp)
+   #    print(hsf.storages_frame.depth)
+   # else: pass
 
    # Write output
   # print('running SWMM at {}'.format(input_file))

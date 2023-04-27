@@ -77,6 +77,7 @@ def write_fcst(filename, imember, state):
          if state[i].kind != 'link': continue
          datum = struct.pack('1f', state[i].fcst[j,imember])
          bin_file.write(datum)
+
    bin_file.close()
 
 if len(sys.argv) > 3:
@@ -249,12 +250,12 @@ for i in range(1,nstate+1):
    if kind == 'subcatchment':
       ana = zeros((nsubcatchment,nmember+1)) # last one for ensemble mean
       fcst = zeros((nsubcatchment,nmember+1))
-   elif kind == 'storage':
-      ana = zeros((nstorage,nmember+1))
-      fcst = zeros((nstorage,nmember+1))
    elif kind == 'node':
       ana = zeros((nnode,nmember+1))
       fcst = zeros((nnode,nmember+1))
+   elif kind == 'storage':
+      ana = zeros((nstorage,nmember+1))
+      fcst = zeros((nstorage,nmember+1))
    elif kind == 'link':
       ana = zeros((nconduit,nmember+1))
       fcst = zeros((nconduit,nmember+1))
@@ -268,17 +269,19 @@ for imember in range(nmember):
    state_file = forecast_dir+'/state'+member[imember]
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
-   print(hsf.storages_frame.depth)
+   # print(hsf.storages_frame.depth)
    # print(hsf.subcatchments_frame)
    # print(hsf.nodes_frame)
    # print(hsf.links_frame)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].fcst[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
-      elif state[i].kind == 'storage':
-         state[i].fcst[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
          state[i].fcst[:,imember] = hsf.nodes_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'storage':
+         state[i].fcst[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+         # print('forecast states @ {} + 30 min'.format(analysis_date))
+         # print(state[i].name, state[i].fcst[0])
       elif state[i].kind == 'link':
          state[i].fcst[:,imember] = hsf.links_frame.loc[:,state[i].name].values
    if cold_start == 1 and analysis_date == start_date: continue
@@ -287,10 +290,12 @@ for imember in range(nmember):
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
-      elif state[i].kind == 'storage':
-         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
          state[i].ana[:,imember] = hsf.nodes_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'storage':
+         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+         # print('old analysis @ {} '.format(analysis_date))
+         # print(state[i].name, state[i].ana[0])
       elif state[i].kind == 'link':
          state[i].ana[:,imember] = hsf.links_frame.loc[:,state[i].name].values
 pass
@@ -324,15 +329,17 @@ if myid == 0 and not (cold_start == 1 and analysis_date == start_date):
    state_file = analysis_dir+'/state'+'%8.8d'%0
    inp = read_inp_file(input_file)
    hsf = read_hst_file(state_file, inp)
-   print('at 04.run_etkf at id = 0')   
-   print(hsf.storages_frame.depth)
+   # print('at 04.run_etkf at id = 0')   
+   # print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values
-      elif state[i].kind == 'storage':
-         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
          state[i].ana[:,-1] = hsf.nodes_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'storage':
+         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
+         # print('deterministic states @ {}'.format(analysis_date))
+         # print(state[i].name, state[i].ana)#[0])
       elif state[i].kind == 'link':
          state[i].ana[:,-1] = hsf.links_frame.loc[:,state[i].name].values
 for i in range(nstate):

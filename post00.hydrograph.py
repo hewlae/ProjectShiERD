@@ -17,7 +17,7 @@ def plot_simgraph(imember, graph_color, graph_width):
         opt = read_out_file(output_file)
         simulation_data = pd.DataFrame()
         sim_value = pd.Series()
-        sim_value = opt.get_part('node',pp).depth
+        sim_value = 3.28 * opt.get_part('node',pp).depth
         simulation_data[wg] = sim_value
         if analysis_date == start_date: 
             simflow = simulation_data
@@ -67,8 +67,7 @@ for imember in range(nmember): member[imember] = '%8.8d'%imember
 # json
 wg_dic = {'G71F04R':'G71F090',
         'G71F05R':'G72K020',
-        'G71F06R':'G71F06R',
-        'G71F68Y':'G71F68Y'}
+        'G71F06R':'G71F06R'}
 
 # Datetime
 date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
