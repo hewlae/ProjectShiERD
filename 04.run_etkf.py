@@ -312,7 +312,7 @@ for i in range(1,nstate+1):
       elif state_control == 1:
          if name[:12] == 'Infiltration': used = False
          elif name[:7] == 'setting': used = False
-         elif name[:8] == 'hydraulic': used = False        
+         elif name[:9] == 'hydraulic': used = False        
       elif state_control == 2:
          used = True
    if kind == 'subcatchment':
@@ -368,6 +368,8 @@ for imember in range(nmember):
          state[i].fcst[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
          state[i].fcst[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+      # print('forecast states @ {} + 30 min'.format(analysis_date))
+      # print(state[i].name, state[i].ana[0])
       elif state[i].kind == 'conduit':
          state[i].fcst[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
       elif state[i].kind == 'street':
@@ -392,10 +394,10 @@ for imember in range(nmember):
          state[i].ana[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
          state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+      # print('analysis states @ {} + 30 min'.format(analysis_date))
+      # print(state[i].name, state[i].ana[0])
       elif state[i].kind == 'conduit':
          state[i].ana[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
-      # print('forecast states @ {} + 30 min'.format(analysis_date))
-      # print(state[i].name, state[i].ana[0])
       elif state[i].kind == 'street':
          state[i].ana[:,imember] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
       elif state[i].kind == 'pump':
@@ -449,7 +451,7 @@ if myid == 0 and not (cold_start == 1 and analysis_date == start_date):
       elif state[i].kind == 'storage':
          state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
          # print('forecast states @ {} + 30 min'.format(analysis_date))
-         # print(state[i].name, state[i].ana[0])
+         # print(state[i].name, state[i].ana)
       elif state[i].kind == 'conduit':
          state[i].ana[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
       elif state[i].kind == 'street':

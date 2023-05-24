@@ -220,25 +220,25 @@ if myid == 0:
    # print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
-         state[i].ana[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
+         state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
-         state[i].ana[:,imember] = hsf.nodes_frame.loc[:nnode-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.nodes_frame.loc[:nnode-1,state[i].name].values
       elif state[i].kind == 'outfall':
-         state[i].ana[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
+         state[i].ana[:,-1] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
-         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
       elif state[i].kind == 'conduit':
-         state[i].ana[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
       elif state[i].kind == 'street':
-         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
       elif state[i].kind == 'pump':
-         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet:nconduit+nstreet+npump-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[nconduit+nstreet:nconduit+nstreet+npump-1,state[i].name].values
       elif state[i].kind == 'orifice':
-         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump:nconduit+nstreet+npump+norifice-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[nconduit+nstreet+npump:nconduit+nstreet+npump+norifice-1,state[i].name].values
       elif state[i].kind == 'weir':
-         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice:nconduit+nstreet+npump+norifice+nweir-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice:nconduit+nstreet+npump+norifice+nweir-1,state[i].name].values
       elif state[i].kind == 'outlet':
-         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice+nweir:nconduit+nstreet+npump+norifice+nweir+noutlet-1,state[i].name].values
+         state[i].ana[:,-1] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice+nweir:nconduit+nstreet+npump+norifice+nweir+noutlet-1,state[i].name].values
 for i in range(nstate):
    n,mtmp = state[i].ana.shape
    if myid == 0: bufr[:n] = state[i].ana[:,-1]
@@ -249,17 +249,19 @@ pass
 # Add perturbations and writeout
 for imember in range(nmember):
    for i in range(nstate): 
-      # if state[i].name == 'depth' and state[i].kind == 'storage': print(state[i].ana)
+      # if state[i].name == 'setting' and state[i].kind == 'outlet': print(state[i].name, state[i].kind, state[i].ana)
       state[i].ana[:,imember] += state[i].ana[:,-1]
-      # if state[i].name == 'depth' and state[i].kind == 'storage': 
+      # if state[i].name == 'setting' and state[i].kind == 'outlet': 
       #    print('after update ...')
-      #    print(state[i].ana)
+      #    print(state[i].name, state[i].kind, state[i].ana)
    state_file = analysis_dir+'/state'+member[imember]
    write_ana(state_file, imember, state)
-   # # to check
+   # to check
    # input_file = forecast_dir+'/input'+'%8.8d'%0
    # state_file = analysis_dir+'/state'+member[imember]
    # inp = read_inp_file(input_file)
    # hsf = read_hst_file(state_file, inp)
+   # print(hsf.nodes_frame[-20:])
+   # print(hsf.links_frame[-30:])
    # print(hsf.storages_frame.depth)
 comm.Barrier()

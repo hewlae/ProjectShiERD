@@ -166,7 +166,7 @@ for imember in range(nmember):
          if j < nconduit and parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
          elif j >= nconduit and parameter[i].name == 'S_Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j-nconduit]
    inp.write_file(input_file)
-   # # to check
+   # to check
    # if not analysis_date == start_date:
    #    input_file = forecast_dir+'/input'+member[imember]
    #    state_file = analysis_dir+'/state'+member[imember]
