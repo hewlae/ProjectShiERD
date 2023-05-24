@@ -27,7 +27,7 @@ def write_ana(filename, imember, state):
    bin_file = open(filename, 'wb')
    data = struct.pack('15s', b'SWMM5-HOTSTART4')
    bin_file.write(data)
-   data = struct.pack('6i', nsubcatchment, nlanduse, nnode+nstorage, nconduit, npollutant, flowunit)
+   data = struct.pack('6i', nsubcatchment, nlanduse, nnode+noutfall+nstorage, nconduit+nstreet+npump+norifice+nweir+noutlet, npollutant, flowunit)
    bin_file.write(data)
    for j in range(nsubcatchment):
       for i in range(nstate):
@@ -39,6 +39,11 @@ def write_ana(filename, imember, state):
          if state[i].kind != 'node': continue
          datum = struct.pack('1f', state[i].ana[j,imember])
          bin_file.write(datum)
+   for j in range(noutfall):
+      for i in range(nstate):
+         if state[i].kind != 'outfall': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
    for j in range(nstorage):
       for i in range(nstate):
          if state[i].kind != 'storage': continue
@@ -46,7 +51,32 @@ def write_ana(filename, imember, state):
          bin_file.write(datum)
    for j in range(nconduit):
       for i in range(nstate):
-         if state[i].kind != 'link': continue
+         if state[i].kind != 'conduit': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(nstreet):
+      for i in range(nstate):
+         if state[i].kind != 'street': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(npump):
+      for i in range(nstate):
+         if state[i].kind != 'pump': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(norifice):
+      for i in range(nstate):
+         if state[i].kind != 'orifice': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(nweir):
+      for i in range(nstate):
+         if state[i].kind != 'weir': continue
+         datum = struct.pack('1f', state[i].ana[j,imember])
+         bin_file.write(datum)
+   for j in range(noutlet):
+      for i in range(nstate):
+         if state[i].kind != 'outlet': continue
          datum = struct.pack('1f', state[i].ana[j,imember])
          bin_file.write(datum)
    bin_file.close()
@@ -55,7 +85,7 @@ def write_fcst(filename, imember, state):
    bin_file = open(filename, 'wb')
    data = struct.pack('15s', b'SWMM5-HOTSTART4')
    bin_file.write(data)
-   data = struct.pack('6i', nsubcatchment, nlanduse, nnode+nstorage, nconduit, npollutant, flowunit)
+   data = struct.pack('6i', nsubcatchment, nlanduse, nnode+noutfall+nstorage, nconduit+nstreet+npump+norifice+nweir+noutlet, npollutant, flowunit)
    bin_file.write(data)
    for j in range(nsubcatchment):
       for i in range(nstate):
@@ -67,6 +97,11 @@ def write_fcst(filename, imember, state):
          if state[i].kind != 'node': continue
          datum = struct.pack('1f', state[i].fcst[j,imember])
          bin_file.write(datum)
+   for j in range(noutfall):
+      for i in range(nstate):
+         if state[i].kind != 'outfall': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
    for j in range(nstorage):
       for i in range(nstate):
          if state[i].kind != 'storage': continue
@@ -74,10 +109,34 @@ def write_fcst(filename, imember, state):
          bin_file.write(datum)
    for j in range(nconduit):
       for i in range(nstate):
-         if state[i].kind != 'link': continue
+         if state[i].kind != 'conduit': continue
          datum = struct.pack('1f', state[i].fcst[j,imember])
          bin_file.write(datum)
-
+   for j in range(nstreet):
+      for i in range(nstate):
+         if state[i].kind != 'street': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
+   for j in range(npump):
+      for i in range(nstate):
+         if state[i].kind != 'pump': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
+   for j in range(norifice):
+      for i in range(nstate):
+         if state[i].kind != 'orifice': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
+   for j in range(nweir):
+      for i in range(nstate):
+         if state[i].kind != 'weir': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
+   for j in range(noutlet):
+      for i in range(nstate):
+         if state[i].kind != 'outlet': continue
+         datum = struct.pack('1f', state[i].fcst[j,imember])
+         bin_file.write(datum)
    bin_file.close()
 
 if len(sys.argv) > 3:
@@ -96,6 +155,7 @@ start_date = p['meta']['start_date']
 para_control = p['da']['para_control']
 state_control = p['da']['state_control']
 used_parameters = p['da']['parameters']
+used_variables = p['da']['statevars']
 cycle = p['da']['cycle']
 interval = p['da']['interval']
 nmember0 = p['da']['nmember']
@@ -103,9 +163,15 @@ herror = p['da']['herror']
 nparameter = p['model']['nparameter']
 nstate = p['model']['nstate']
 nsubcatchment = p['model']['nsubcatchment']
-nstorage = p['model']['nstorage']
 nnode = p['model']['nnode']
+noutfall = p['model']['noutfall']
+nstorage = p['model']['nstorage']
 nconduit = p['model']['nconduit']
+nstreet = p['model']['nstreet']
+npump = p['model']['npump']
+norifice = p['model']['norifice']
+nweir = p['model']['nweir']
+noutlet = p['model']['noutlet']
 npollutant = 0; nlanduse = 0; flowunit = 3
 qcthreshold = 6.
 
@@ -181,8 +247,9 @@ for i in range(1,nparameter+1):
       data = zeros((1,nmember+1))
    elif para_control == 2:
       if name in ('Roughness',): data = zeros((nconduit,nmember+1)) # last one for ensemble mean
+      elif name in ('S_Roughness'): data = zeros((nstreet,nmember+1))
       else: data = zeros((nsubcatchment,nmember+1))
-   #print(name, used, minval, meanval, maxval)
+   # print(name, used, minval, meanval, maxval)
    parameter.append(Parameter(name, used, minval, meanval, maxval, data))
 pass
 
@@ -203,7 +270,7 @@ for imember in range(nmember):
          nchar = tmp.count('')
          for k in range(nchar): tmp.remove('')
          parameter[i].data[j,imember] = float(tmp[0])
-      #if imember == 1: print(parameter[i].name, parameter[i].data[0])
+      # if imember == 1: print(parameter[i].name, parameter[i].data[0])
    text_file.close()
 pass
 
@@ -237,28 +304,47 @@ for i in range(1,nstate+1):
    for j in range(nchar): tmp.remove('')
    name = tmp[0].strip()
    kind = tmp[1].strip()
-   used = True
-   if state_control == 0:
-      used = False
-   elif state_control == 1:
-      if name[:12] == 'Infiltration': used = False
-      elif name[:7] == 'setting': used = False
-      elif name[:8] == 'hydraulic': used = False
-      else: used = True
-   elif state_control == 2:
-      used = True
+   if kind in used_variables: used = True
+   else: used = False
+   if used:
+      if state_control == 0:
+         used = False
+      elif state_control == 1:
+         if name[:12] == 'Infiltration': used = False
+         elif name[:7] == 'setting': used = False
+         elif name[:8] == 'hydraulic': used = False        
+      elif state_control == 2:
+         used = True
    if kind == 'subcatchment':
       ana = zeros((nsubcatchment,nmember+1)) # last one for ensemble mean
       fcst = zeros((nsubcatchment,nmember+1))
    elif kind == 'node':
       ana = zeros((nnode,nmember+1))
       fcst = zeros((nnode,nmember+1))
+   elif kind == 'outfall':
+      ana = zeros((noutfall,nmember+1))
+      fcst = zeros((noutfall,nmember+1))
    elif kind == 'storage':
       ana = zeros((nstorage,nmember+1))
       fcst = zeros((nstorage,nmember+1))
-   elif kind == 'link':
+   elif kind == 'conduit':
       ana = zeros((nconduit,nmember+1))
       fcst = zeros((nconduit,nmember+1))
+   elif kind == 'street':
+      ana = zeros((nstreet,nmember+1))
+      fcst = zeros((nstreet,nmember+1))
+   elif kind == 'pump':
+      ana = zeros((npump,nmember+1))
+      fcst = zeros((npump,nmember+1))
+   elif kind == 'orifice':
+      ana = zeros((norifice,nmember+1))
+      fcst = zeros((norifice,nmember+1))
+   elif kind == 'weir':
+      ana = zeros((nweir,nmember+1))
+      fcst = zeros((nweir,nmember+1))
+   elif kind == 'outlet':
+      ana = zeros((noutlet,nmember+1))
+      fcst = zeros((noutlet,nmember+1))      
    # print(name, kind, used)
    state.append(State(name, kind, used, ana, fcst))
 pass
@@ -277,13 +363,23 @@ for imember in range(nmember):
       if state[i].kind == 'subcatchment':
          state[i].fcst[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
-         state[i].fcst[:,imember] = hsf.nodes_frame.loc[:,state[i].name].values
+         state[i].fcst[:,imember] = hsf.nodes_frame.loc[:nnode-1,state[i].name].values
+      elif state[i].kind == 'outfall':
+         state[i].fcst[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
          state[i].fcst[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
-         # print('forecast states @ {} + 30 min'.format(analysis_date))
-         # print(state[i].name, state[i].fcst[0])
-      elif state[i].kind == 'link':
-         state[i].fcst[:,imember] = hsf.links_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'conduit':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
+      elif state[i].kind == 'street':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
+      elif state[i].kind == 'pump':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[nconduit+nstreet:nconduit+nstreet+npump-1,state[i].name].values
+      elif state[i].kind == 'orifice':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump:nconduit+nstreet+npump+norifice-1,state[i].name].values
+      elif state[i].kind == 'weir':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice:nconduit+nstreet+npump+norifice+nweir-1,state[i].name].values
+      elif state[i].kind == 'outlet':
+         state[i].fcst[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice+nweir:nconduit+nstreet+npump+norifice+nweir+noutlet-1,state[i].name].values
    if cold_start == 1 and analysis_date == start_date: continue
    state_file = analysis_dir+'/state'+member[imember]
    hsf = read_hst_file(state_file, inp)
@@ -291,17 +387,29 @@ for imember in range(nmember):
       if state[i].kind == 'subcatchment':
          state[i].ana[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
-         state[i].ana[:,imember] = hsf.nodes_frame.loc[:,state[i].name].values
+         state[i].ana[:,imember] = hsf.nodes_frame.loc[:nnode-1,state[i].name].values
+      elif state[i].kind == 'outfall':
+         state[i].ana[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
          state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
-         # print('old analysis @ {} '.format(analysis_date))
-         # print(state[i].name, state[i].ana[0])
-      elif state[i].kind == 'link':
-         state[i].ana[:,imember] = hsf.links_frame.loc[:,state[i].name].values
+      elif state[i].kind == 'conduit':
+         state[i].ana[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
+      # print('forecast states @ {} + 30 min'.format(analysis_date))
+      # print(state[i].name, state[i].ana[0])
+      elif state[i].kind == 'street':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
+      elif state[i].kind == 'pump':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet:nconduit+nstreet+npump-1,state[i].name].values
+      elif state[i].kind == 'orifice':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump:nconduit+nstreet+npump+norifice-1,state[i].name].values
+      elif state[i].kind == 'weir':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice:nconduit+nstreet+npump+norifice+nweir-1,state[i].name].values
+      elif state[i].kind == 'outlet':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice+nweir:nconduit+nstreet+npump+norifice+nweir+noutlet-1,state[i].name].values
 pass
 
 # State perturbations
-n = max(nconduit,nnode+nstorage,nsubcatchment)
+n = max(nconduit,nstreet,nnode,nstorage,nsubcatchment)
 src = zeros((n)); bufr = zeros((n))
 for i in range(nstate):
    state[i].fcst[:,-1] = state[i].fcst[:,:-1].sum(axis=1)
@@ -333,15 +441,28 @@ if myid == 0 and not (cold_start == 1 and analysis_date == start_date):
    # print(hsf.storages_frame.depth)
    for i in range(nstate):
       if state[i].kind == 'subcatchment':
-         state[i].ana[:,-1] = hsf.subcatchments_frame.loc[:,state[i].name].values
+         state[i].ana[:,imember] = hsf.subcatchments_frame.loc[:,state[i].name].values
       elif state[i].kind == 'node':
-         state[i].ana[:,-1] = hsf.nodes_frame.loc[:,state[i].name].values
+         state[i].ana[:,imember] = hsf.nodes_frame.loc[:nnode-1,state[i].name].values
+      elif state[i].kind == 'outfall':
+         state[i].ana[:,imember] = hsf.nodes_frame.loc[nnode:,state[i].name].values
       elif state[i].kind == 'storage':
-         state[i].ana[:,-1] = hsf.storages_frame.loc[:,state[i].name].values
-         # print('deterministic states @ {}'.format(analysis_date))
-         # print(state[i].name, state[i].ana)#[0])
-      elif state[i].kind == 'link':
-         state[i].ana[:,-1] = hsf.links_frame.loc[:,state[i].name].values
+         state[i].ana[:,imember] = hsf.storages_frame.loc[:,state[i].name].values
+         # print('forecast states @ {} + 30 min'.format(analysis_date))
+         # print(state[i].name, state[i].ana[0])
+      elif state[i].kind == 'conduit':
+         state[i].ana[:,imember] = hsf.links_frame.loc[:nconduit-1,state[i].name].values
+      elif state[i].kind == 'street':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit:nconduit+nstreet-1,state[i].name].values
+      elif state[i].kind == 'pump':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet:nconduit+nstreet+npump-1,state[i].name].values
+      elif state[i].kind == 'orifice':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump:nconduit+nstreet+npump+norifice-1,state[i].name].values
+      elif state[i].kind == 'weir':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice:nconduit+nstreet+npump+norifice+nweir-1,state[i].name].values
+      elif state[i].kind == 'outlet':
+         state[i].ana[:,imember] = hsf.links_frame.loc[nconduit+nstreet+npump+norifice+nweir:nconduit+nstreet+npump+norifice+nweir+noutlet-1,state[i].name].values
+         # print(state[i].ana[:,imember])
 for i in range(nstate):
    if cold_start == 1 and analysis_date == start_date: continue
    n,mtmp = state[i].ana.shape

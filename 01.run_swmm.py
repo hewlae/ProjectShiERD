@@ -36,6 +36,7 @@ nmember = p['da']['nmember']
 nparameter = p['model']['nparameter']
 nsubcatchment = p['model']['nsubcatchment']
 nconduit = p['model']['nconduit']
+nstreet = p['model']['nstreet']
 ninfiltration = nsubarea = nsubcatchment
 
 # Directories
@@ -87,6 +88,7 @@ for i in range(1,nparameter+1):
    meanval = float(tmp[2])
    maxval = float(tmp[3])
    if name in ('Roughness',): data = zeros((nconduit))
+   elif name in ('S_Roughness'): data = zeros((nstreet))
    else: data = zeros((nsubcatchment))
    if not used: data[:] = meanval
    #print(name, used, minval, meanval, maxval)
@@ -161,7 +163,8 @@ for imember in range(nmember):
    for j,conduit in enumerate(conduits):
       #print(inp[CONDUITS][conduit])
       for i in range(nparameter):
-         if parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
+         if j < nconduit and parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
+         elif j >= nconduit and parameter[i].name == 'S_Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j-nconduit]
    inp.write_file(input_file)
    # # to check
    # if not analysis_date == start_date:

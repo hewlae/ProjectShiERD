@@ -62,7 +62,7 @@ for imember in range(nmember):
    output_file = forecast_dir+'/output'+member[imember]
    out = read_out_file(output_file)
    for isite in range(nsite):
-      #print(out.get_part(OBJECTS.NODE, obssite[isite], VARIABLES.NODE.DEPTH).values[1:])
+      # print(out.get_part(OBJECTS.NODE, obssite[isite], VARIABLES.NODE.DEPTH).values[1:])
       obs[:,isite] = 3.28 * out.get_part(OBJECTS.NODE, obssite[isite], VARIABLES.NODE.DEPTH).values[0:]
    # Write
    obs_file = forecast_dir+'/obs'+member[imember]
