@@ -1,6 +1,7 @@
 import pandas as pd
 from numpy import *
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import seaborn as sns
 import json, yaml
 import datetime
@@ -134,17 +135,13 @@ for wg,pp in wg_dic.items():
     ax2.set(ylim=(0, 25))
     ax2.set_ylabel("Rainfall [mm]", fontsize = '15')
     ax2.invert_yaxis()
-    ax1.legend(labels=wg, loc = 5, fontsize = '15') 
-    plot_simgraph(0, 'red', 2) # ensemble mean
-    sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
-    # ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
-    ax1.set(ylim=(0, obsflow[wg].max()+0.3))
+    ax1.set(ylim=(0, obsflow[wg].max()+0.7))
     ax1.set_ylabel("W.L : {} [m]".format(wg), fontsize = '15')
-    ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
     for imember in range(nmember):
         plot_simgraph(imember, 'grey', 1)
     sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
     plot_simgraph(0, 'red', 2) # ensemble mean
-    # ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
+    legend_elements = [Line2D([0], [0], color='green', lw=4, label='observation'), Line2D([0], [0], color='red', lw=4, label='simulation')]
+    ax1.legend(handles=legend_elements, loc = 5, fontsize = '15')
     plt.savefig(graph_dir+'/{}.png'.format(wg))
     plt.clf()
