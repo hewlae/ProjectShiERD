@@ -34,7 +34,7 @@ obs_dir = root_dir+'/exp/'+experiment+ex_no+'/observation'
 obs_file = root_dir+'/exp/'+experiment+ex_no+'/observation/obs'+analysis_date
 flood_dir =  root_dir+'/exp/'+experiment+ex_no+'/flood/'+start_date+'_'+end_date
 if not os.path.isdir(flood_dir): os.system('mkdir -p '+flood_dir)
-flood_file = flood_dir+'/flood'+'%8.8d'%0
+flood_file = flood_dir+'/flood'+'%8.8d'%0+'.inp'
 
 # Datetime
 date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
@@ -57,7 +57,7 @@ while date < end_date:
     for conduit in links.keys():
         if conduit[-1] != 'R': continue
         flooding = out.get_part('link', conduit).depth
-        if not flooding[flooding > 0.4].empty:
+        if not flooding[flooding > 0.1].empty:
             print(conduit, flooding.max)
             flooded.add(conduit)
     date += datetime.timedelta(minutes=cycle)
@@ -70,7 +70,8 @@ for conduit in flooded:
 
 flood_template_file = const_dir+'/flood.txt'
 flood_inp = read_inp_file(flood_template_file)
-flood_inp.add_new_section(roads)
+for street in roads.values():
+    flood_inp.CONDUITS.add_obj(street)
 print(flood_inp.CONDUITS)
 # flood_inp.add_new_section(xroads)
 flood_inp.write_file(flood_file)
