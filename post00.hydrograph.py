@@ -17,7 +17,7 @@ def plot_simgraph(imember, graph_color, graph_width):
         opt = read_out_file(output_file)
         simulation_data = pd.DataFrame()
         sim_value = pd.Series()
-        sim_value = 3.28 * opt.get_part('node',pp).depth
+        sim_value = opt.get_part('node',pp).depth
         simulation_data[wg] = sim_value
         if analysis_date == start_date: 
             simflow = simulation_data
@@ -109,8 +109,10 @@ while date < end_date:
     obs_data = pd.read_csv(obs_file, sep = '\s+', engine='python')
     obs_data['Datetime'] = pd.to_datetime(obs_data['Datetime'], format='%Y%m%d%H%M')
     obs_data = obs_data.set_index('Datetime')
+    for wg,pp in wg_dic.items():
+        obs_data[wg] = obs_data[wg] * 0.3048
     if analysis_date == start_date: 
-        obsflow = obs_data
+        obsflow = obs_data#/0.3048
     else:
         obsflow = pd.concat([obsflow, obs_data])
     date += datetime.timedelta(minutes=cycle)
@@ -129,15 +131,16 @@ for wg,pp in wg_dic.items():
     ax2 = ax1.twinx()
     sns.lineplot(x = rain_df.index, y= "rg5425", data = rain_df, color="blue", ax=ax2)
     ax2.fill_between(rain_df.index, 0, rain_df["rg5425"],alpha = 0.8)
-    ax2.set(ylim=(0, 20))
+    ax2.set(ylim=(0, 25))
     ax2.set_ylabel("Rainfall [mm]", fontsize = '15')
     ax2.invert_yaxis()
     ax1.legend(labels=wg, loc = 5, fontsize = '15') 
     plot_simgraph(0, 'red', 2) # ensemble mean
     sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
-    ax1.legend(labels=['simulation', 'rainfall','observation'], loc = 5, fontsize = '15')
-    ax1.set(ylim=(0, obsflow[wg].max()+0.8))
+    # ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
+    ax1.set(ylim=(0, obsflow[wg].max()+0.3))
     ax1.set_ylabel("W.L : {} [m]".format(wg), fontsize = '15')
+    ax1.legend(labels=['simulation', 'observation'], loc = 5, fontsize = '15')
     for imember in range(nmember):
         plot_simgraph(imember, 'grey', 1)
     sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
