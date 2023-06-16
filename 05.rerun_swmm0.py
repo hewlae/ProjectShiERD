@@ -2,7 +2,7 @@
 import sys, os, shutil, datetime, re, yaml
 from numpy import *
 from swmm_api import read_inp_file
-from swmm_api.input_file.section_labels import OPTIONS, FILES, SUBCATCHMENTS, SUBAREAS, INFILTRATION, CONDUITS
+from swmm_api.input_file.section_labels import OPTIONS, FILES, SUBCATCHMENTS, SUBAREAS, INFILTRATION, CONDUITS, TIMESERIES
 
 class Parameter:
    def __init__(self, name, used, minval, meanval, maxval, data):
@@ -61,6 +61,38 @@ date += datetime.timedelta(minutes=1)
 end_date = date.strftime('%Y%m%d%H%M')
 analysis_dir += '/'+forecast_date
 if not os.path.isdir(analysis_dir): os.system('mkdir -p '+analysis_dir)
+
+# Rainfall 
+raingage = ['rg5425', 'rg5427'] # a Case in Bellinge Dataset
+rg_timeseries = {}
+ncycle = int(cycle/interval)+1 # cycle/interval = 10/2 + 1 = 6
+cycledate = list(range(ncycle)) 
+nrain = int(cycle)
+raindate = list(range(nrain))
+date = datetime.datetime(int(analysis_date[:4]),int(analysis_date[4:6]),int(analysis_date[6:8]),int(analysis_date[8:10]),int(analysis_date[10:12]))
+for rg in raingage:
+   # -1. Create rainfall timeseries (every minutes)
+   for itime in range(nrain):
+      raindate[itime] = (date + datetime.timedelta(minutes=itime), float(0.0))
+   # -2. Insert rainfall data if applicable
+   raw_files = []
+   for itime in range(ncycle):
+      cycledate[itime] = date + datetime.timedelta(minutes=itime*interval) 
+      raw_file = rg + '_' + cycledate[itime].strftime('%Y%m%d') + '.csv'
+      if raw_file not in raw_files: raw_files.append(raw_file)
+   for raw_file in raw_files:
+      if not os.path.isfile(rainfall_dir+'/'+raw_file): continue
+   text_file = open(rainfall_dir+'/'+raw_file,'r', encoding='utf-8')
+   line = text_file.readlines()
+   text_file.close()
+   for i in range(1,len(line)):
+      tmp = re.split(',', line[i].strip()) #.strip()
+      linedate = datetime.datetime(int(tmp[0][:4]),int(tmp[0][5:7]),int(tmp[0][8:10]),int(tmp[0][11:13]),int(tmp[0][14:16]))
+      if linedate > raindate[-1][0] or linedate < raindate[0][0] : continue
+      for i, t in enumerate(raindate):
+         if t[0] != linedate : continue
+         raindate[i][1] = float(tmp[1])
+   rg_timeseries[rg] = raindate      
 
 # Parameter
 parameter = []
@@ -128,6 +160,9 @@ for imember in range(nmember):
    if cold_start == 1 and analysis_date == start_date: pass
    else: inp[FILES]['USE HOTSTART'] = '"'+reanalysis_dir+'/state'+member[imember]+'"'
    inp[FILES]['SAVE HOTSTART'] = '"'+analysis_dir+'/state'+member[imember]+'"'
+   # Rainfall
+   for rg in raingage:
+      inp[TIMESERIES]['uni_{}'.format(rg)].data = rg_timeseries[rg]
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
    for j,subcatchment in enumerate(subcatchments):
