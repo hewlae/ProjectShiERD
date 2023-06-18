@@ -28,7 +28,8 @@ cold_start = p['meta']['cold_start']
 start_date = p['meta']['start_date']
 control = p['da']['para_control']
 used_parameters = p['da']['parameters']
-# rain_control = p['da']['rain_control']
+rain_control = p['da']['rain_control']
+used_raingrids = p['da']['raingrids']
 cycle = p['da']['cycle']
 interval = p['da']['interval']
 nparameter = p['model']['nparameter']
@@ -69,7 +70,7 @@ json_file = open(rg_file, 'r')
 dic = json.load(json_file)
 json_file.close()
 rg_timeseries = {}
-ncycle = int(cycle/interval) # cycle/interval = 10/2 + 1 = 6
+ncycle = int(cycle/interval) # cycle/interval = 10/2 = 5
 cycledate = list(range(ncycle)) 
 nrain = int(cycle)
 raindate = list(range(nrain))
@@ -104,7 +105,7 @@ parameter_file = const_dir+'/parameters.txt'
 text_file = open(parameter_file,'r')
 line = text_file.readlines()
 text_file.close()
-for i in range(1,nparameter+1):
+for i in range(1,nparameter+rain_control+1):
    tmp = re.split('\t',line[i].strip())
    nchar = tmp.count('')
    for j in range(nchar): tmp.remove('')
@@ -116,6 +117,7 @@ for i in range(1,nparameter+1):
    maxval = float(tmp[3])
    if name in ('Roughness',): data = zeros((nconduit))
    elif name in ('S_Roughness'): data = zeros((nstreet))
+   elif name in ('SVRI'): data = zeros((len(used_raingrids)))
    else: data = zeros((nsubcatchment))
    if not used: data[:] = meanval
    #print(name, used, minval, meanval, maxval)
@@ -165,10 +167,14 @@ for imember in range(nmember):
    else: inp[FILES]['USE HOTSTART'] = '"'+reanalysis_dir+'/state'+member[imember]+'"'
    inp[FILES]['SAVE HOTSTART'] = '"'+analysis_dir+'/state'+member[imember]+'"'
    # Rainfall
-   # for rg in dic.keys():
    for rg, grids in dic.items():
       for grid in grids:
-         inp[TIMESERIES]['svri_{}'.format(grid)].data = rg_timeseries[rg]
+         if rain_control == 1 and grid in used_raingrids : 
+            grid_timeseries = rg_timeseries[rg]
+            for i in range(len(grid_timeseries)):
+               grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
+            inp[TIMESERIES]['svri_{}'.format(grid)].data = grid_timeseries
+         else : inp[TIMESERIES]['svri_{}'.format(grid)].data = rg_timeseries[rg]
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
    for j,subcatchment in enumerate(subcatchments):

@@ -154,8 +154,10 @@ cold_start = p['meta']['cold_start']
 start_date = p['meta']['start_date']
 para_control = p['da']['para_control']
 state_control = p['da']['state_control']
+rain_control = p['da']['rain_control']
 used_parameters = p['da']['parameters']
 used_variables = p['da']['statevars']
+used_raingrids = p['da']['raingrids']
 cycle = p['da']['cycle']
 interval = p['da']['interval']
 nmember0 = p['da']['nmember']
@@ -229,12 +231,13 @@ parameter_file = const_dir+'/parameters.txt'
 text_file = open(parameter_file,'r')
 line = text_file.readlines()
 text_file.close()
-for i in range(1,nparameter+1):
+for i in range(1,nparameter+rain_control+1):
    tmp = re.split('\t',line[i].strip())
    nchar = tmp.count('')
    for j in range(nchar): tmp.remove('')
    name = tmp[0].strip()
    if name in used_parameters: used = True
+   elif name in ('SVRI'): used = True
    else: used = False
    minval = float(tmp[1])
    meanval = float(tmp[2])
@@ -247,6 +250,7 @@ for i in range(1,nparameter+1):
    elif para_control == 2:
       if name in ('Roughness',): data = zeros((nconduit,nmember+1)) # last one for ensemble mean
       elif name in ('S_Roughness'): data = zeros((nstreet,nmember+1))
+      elif name in ('SVRI'): data = zeros((len(used_raingrids),nmember+1))
       else: data = zeros((nsubcatchment,nmember+1))
    # print(name, used, minval, meanval, maxval)
    parameter.append(Parameter(name, used, minval, meanval, maxval, data))
