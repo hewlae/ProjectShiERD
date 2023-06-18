@@ -196,7 +196,6 @@ current_dir = os.getcwd()
 os.chdir(work_dir)
 if myid == 0 and not os.path.isdir(reanalysis_dir): 
    os.system('mkdir -p '+reanalysis_dir)
-   os.system('ln -s '+rainfall_dir+'/*.dat '+reanalysis_dir)
 
 # Member
 nmember = 0
@@ -275,7 +274,7 @@ for imember in range(nmember):
 pass
 
 # Parameter perturbations
-n = max(nconduit,nsubcatchment)
+n = max([nconduit,nstreet,nnode,nstorage,nsubcatchment])
 src = zeros((n)); bufr = zeros((n))
 for i in range(nparameter):
    if not parameter[i].used: continue
@@ -411,7 +410,7 @@ for imember in range(nmember):
 pass
 
 # State perturbations
-n = max(nconduit,nstreet,nnode,nstorage,nsubcatchment)
+n = max([nconduit,nstreet,nnode,nstorage,nsubcatchment])
 src = zeros((n)); bufr = zeros((n))
 for i in range(nstate):
    state[i].fcst[:,-1] = state[i].fcst[:,:-1].sum(axis=1)
@@ -573,7 +572,7 @@ for k in range(nrank): V[:,k] = dot(Y[:,:-1].T,U[:,k])/G[k]
 # Adaptive inflation
 for k in range(nrank):
    FG[k] = G[k]*L[k]**2*abs(d[k])
-   FG[k] = max(FG[k],G[k]*L[k])
+   FG[k] = max([FG[k],G[k]*L[k]])
 for k in range(1,nrank):
    if FG[k] > FG[k-1]: FG[k] = FG[k-1]
 FL[:nrank] = FG[:nrank]/G[:nrank]

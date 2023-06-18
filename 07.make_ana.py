@@ -209,7 +209,7 @@ for imember in range(nmember):
 pass
 
 # Read the deterministic one
-n = max(nconduit,nstreet,nnode,nstorage,nsubcatchment)
+n = max([nconduit,nstreet,nnode,nstorage,nsubcatchment])
 bufr = zeros((n))
 if myid == 0:
    input_file = forecast_dir+'/input'+'%8.8d'%0

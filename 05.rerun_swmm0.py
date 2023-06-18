@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-import sys, os, shutil, datetime, re, yaml
+import sys, os, shutil, datetime, re, yaml, json
 from numpy import *
 from swmm_api import read_inp_file
 from swmm_api.input_file.section_labels import OPTIONS, FILES, SUBCATCHMENTS, SUBAREAS, INFILTRATION, CONDUITS, TIMESERIES
@@ -28,6 +28,7 @@ cold_start = p['meta']['cold_start']
 start_date = p['meta']['start_date']
 control = p['da']['para_control']
 used_parameters = p['da']['parameters']
+# rain_control = p['da']['rain_control']
 cycle = p['da']['cycle']
 interval = p['da']['interval']
 nparameter = p['model']['nparameter']
@@ -63,17 +64,20 @@ analysis_dir += '/'+forecast_date
 if not os.path.isdir(analysis_dir): os.system('mkdir -p '+analysis_dir)
 
 # Rainfall 
-raingage = ['rg5425', 'rg5427'] # a Case in Bellinge Dataset
+rg_file = const_dir+'/raingtog.json'
+json_file = open(rg_file, 'r')
+dic = json.load(json_file)
+json_file.close()
 rg_timeseries = {}
-ncycle = int(cycle/interval)+1 # cycle/interval = 10/2 + 1 = 6
+ncycle = int(cycle/interval) # cycle/interval = 10/2 + 1 = 6
 cycledate = list(range(ncycle)) 
 nrain = int(cycle)
 raindate = list(range(nrain))
 date = datetime.datetime(int(analysis_date[:4]),int(analysis_date[4:6]),int(analysis_date[6:8]),int(analysis_date[8:10]),int(analysis_date[10:12]))
-for rg in raingage:
+for rg in dic.keys():
    # -1. Create rainfall timeseries (every minutes)
    for itime in range(nrain):
-      raindate[itime] = (date + datetime.timedelta(minutes=itime), float(0.0))
+      raindate[itime] = [date + datetime.timedelta(minutes=itime), float(0.0)]
    # -2. Insert rainfall data if applicable
    raw_files = []
    for itime in range(ncycle):
@@ -161,8 +165,10 @@ for imember in range(nmember):
    else: inp[FILES]['USE HOTSTART'] = '"'+reanalysis_dir+'/state'+member[imember]+'"'
    inp[FILES]['SAVE HOTSTART'] = '"'+analysis_dir+'/state'+member[imember]+'"'
    # Rainfall
-   for rg in raingage:
-      inp[TIMESERIES]['uni_{}'.format(rg)].data = rg_timeseries[rg]
+   # for rg in dic.keys():
+   for rg, grids in dic.items():
+      for grid in grids:
+         inp[TIMESERIES]['svri_{}'.format(grid)].data = rg_timeseries[rg]
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
    for j,subcatchment in enumerate(subcatchments):
