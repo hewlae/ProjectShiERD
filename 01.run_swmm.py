@@ -153,7 +153,7 @@ for imember in range(nmember):
    # Read parameters
    parameter_file = parameter_dir+'/para'+member[imember]
    text_file = open(parameter_file, 'r')
-   for i in range(nparameter):
+   for i in range(nparameter+rain_control):
       if not parameter[i].used: continue
       line = text_file.readline()
       tmp = re.split('\t',line.strip())

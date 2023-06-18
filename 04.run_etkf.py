@@ -260,7 +260,7 @@ pass
 for imember in range(nmember):
    parameter_file = parameter_dir+'/para'+member[imember]
    text_file = open(parameter_file, 'r')
-   for i in range(nparameter):
+   for i in range(nparameter+rain_control):
       if not parameter[i].used: continue
       line = text_file.readline()
       tmp = re.split('\t',line.strip())
@@ -280,7 +280,7 @@ pass
 # Parameter perturbations
 n = max([nconduit,nstreet,nnode,nstorage,nsubcatchment])
 src = zeros((n)); bufr = zeros((n))
-for i in range(nparameter):
+for i in range(nparameter+rain_control):
    if not parameter[i].used: continue
    parameter[i].data[:,-1] = parameter[i].data[:,:-1].sum(axis=1)
    n,mtmp = parameter[i].data.shape
@@ -593,7 +593,7 @@ FL[:nrank] = 1. - FL[:nrank]
 
 # Part 5: Parameter analyses
 # Parameter analyses
-for i in range(nparameter):
+for i in range(nparameter+rain_control):
    if not parameter[i].used: continue
    n,mtmp = parameter[i].data.shape
    for j in range(n):
@@ -610,7 +610,7 @@ for i in range(nparameter):
 for imember in range(nmember):
    parameter_file = newparameter_dir+'/para'+member[imember]
    text_file = open(parameter_file, 'w')
-   for i in range(nparameter):
+   for i in range(nparameter+rain_control):
       if not parameter[i].used: continue
       n, mtmp = parameter[i].data.shape
       text_file.write(parameter[i].name+'\t'+str(n)+'\n')
@@ -622,7 +622,7 @@ for imember in range(nmember):
 if myid == 0:
    parameter_file = newparameter_dir+'/para'+'%8.8d'%0
    text_file = open(parameter_file, 'w')
-   for i in range(nparameter):
+   for i in range(nparameter+rain_control):
       if not parameter[i].used: continue
       n, mtmp = parameter[i].data.shape
       text_file.write(parameter[i].name+'\t'+str(n)+'\n')
