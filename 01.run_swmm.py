@@ -115,7 +115,7 @@ for rg in dic.keys():
       for i, t in enumerate(raindate):
          if t[0] != linedate : continue
          raindate[i][1] = float(tmp[1])
-   rg_timeseries[rg] = raindate      
+   rg_timeseries[rg] = raindate[:]      
 
 # Parameter
 parameter = []
