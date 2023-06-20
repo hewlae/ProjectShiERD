@@ -169,7 +169,7 @@ for imember in range(nmember):
    # Rainfall
    for rg, grids in dic.items():
       for grid in grids:
-         if rain_control == 1 and grid in used_raingrids : 
+         if (rain_control == 1 and grid in used_raingrids) : 
             grid_timeseries = rg_timeseries[rg]
             for i in range(len(grid_timeseries)):
                grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
