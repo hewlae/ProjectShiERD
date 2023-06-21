@@ -97,7 +97,7 @@ for rg in dic.keys():
       for i, t in enumerate(raindate):
          if t[0] != linedate : continue
          raindate[i][1] = float(tmp[1])
-   rg_timeseries[rg] = raindate[:]      
+   rg_timeseries[rg] = array(raindate)      
 
 # Parameter
 parameter = []
@@ -111,6 +111,7 @@ for i in range(1,nparameter+rain_control+1):
    for j in range(nchar): tmp.remove('')
    name = tmp[0].strip()
    if name in used_parameters: used = True
+   elif name in ('SVRI'): used = True
    else: used = False
    minval = float(tmp[1])
    meanval = float(tmp[2])
@@ -148,7 +149,7 @@ for imember in range(nmember):
       #if imember == 1: print(parameter[i].name, parameter[i].data[0])
       if control == 1: parameter[i].data[1:] = parameter[i].data[0]
    text_file.close()
-   
+   print(parameter[-1].name, parameter[-1].used, parameter[-1].data)
    # Write input
    input_file = reanalysis_dir+'/input'+member[imember]
    inp = read_inp_file(template_file)
@@ -173,8 +174,16 @@ for imember in range(nmember):
             grid_timeseries = rg_timeseries[rg]
             for i in range(len(grid_timeseries)):
                grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
-            inp[TIMESERIES]['svri_{}'.format(grid)].data = grid_timeseries
-         else : inp[TIMESERIES]['svri_{}'.format(grid)].data = rg_timeseries[rg]
+            inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
+            print(grid, 'A')
+            print(parameter[-1].data[used_raingrids.index(grid)])
+            print(inp[TIMESERIES]['svri_{}'.format(grid)].data)
+            print(grid_timeseries)
+         else : 
+            inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
+            print(grid, 'B')
+            print(inp[TIMESERIES]['svri_{}'.format(grid)].data)
+            print(rg_timeseries[rg])
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
    for j,subcatchment in enumerate(subcatchments):

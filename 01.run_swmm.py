@@ -115,7 +115,7 @@ for rg in dic.keys():
       for i, t in enumerate(raindate):
          if t[0] != linedate : continue
          raindate[i][1] = float(tmp[1])
-   rg_timeseries[rg] = raindate[:]      
+   rg_timeseries[rg] = array(raindate)      
 
 # Parameter
 parameter = []
@@ -194,8 +194,8 @@ for imember in range(nmember):
             grid_timeseries = rg_timeseries[rg]
             for i in range(len(grid_timeseries)):
                grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
-            inp[TIMESERIES]['svri_{}'.format(grid)].data = grid_timeseries
-         else : inp[TIMESERIES]['svri_{}'.format(grid)].data = rg_timeseries[rg]
+            inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
+         else : inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
 
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
