@@ -175,15 +175,9 @@ for imember in range(nmember):
             for i in range(len(grid_timeseries)):
                grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
             inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
-            print(grid, 'A')
-            print(parameter[-1].data[used_raingrids.index(grid)])
-            print(inp[TIMESERIES]['svri_{}'.format(grid)].data)
-            print(grid_timeseries)
          else : 
             inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
-            print(grid, 'B')
-            print(inp[TIMESERIES]['svri_{}'.format(grid)].data)
-            print(rg_timeseries[rg])
+
    # Subcatchment
    subcatchments = inp[SUBCATCHMENTS].keys()
    for j,subcatchment in enumerate(subcatchments):
