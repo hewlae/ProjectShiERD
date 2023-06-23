@@ -149,7 +149,7 @@ for imember in range(nmember):
       #if imember == 1: print(parameter[i].name, parameter[i].data[0])
       if control == 1: parameter[i].data[1:] = parameter[i].data[0]
    text_file.close()
-   print(parameter[-1].name, parameter[-1].used, parameter[-1].data)
+   # print(parameter[-1].name, parameter[-1].used, parameter[-1].data)
    # Write input
    input_file = reanalysis_dir+'/input'+member[imember]
    inp = read_inp_file(template_file)
