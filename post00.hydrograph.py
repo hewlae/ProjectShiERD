@@ -66,9 +66,21 @@ member = list(range(nmember))
 for imember in range(nmember): member[imember] = '%8.8d'%imember
 
 # json
-wg_dic = {'G71F04R':'G71F090',
-        'G71F05R':'G72K020',
-        'G71F06R':'G71F06R'}
+# wg_dic = {'G71F04R':'G71F090',
+#         'G71F05R':'G72K020',
+#         'G71F06R':'G71F06R'}
+wg_dic = {}
+obssite_file = const_dir+'/obssites.txt'
+text_file = open(obssite_file,'r')
+line = text_file.readlines()
+text_file.close()
+for i in range(1,len(line)):
+   tmp = re.split('\t',line[i].strip())
+   nchar = tmp.count('')
+   for j in range(nchar): tmp.remove('')
+   if len(tmp) == 0: continue
+   wg_dic[tmp[0].strip()] = tmp[1].strip() 
+print(wg_dic)
 
 # Datetime
 date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
