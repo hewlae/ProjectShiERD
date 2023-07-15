@@ -37,7 +37,7 @@ control_file.close()
 root_dir = p['meta']['root_dir']
 cold_start = p['meta']['cold_start']
 start_date = p['meta']['start_date']
-control = p['da']['para_control']
+para_control = p['da']['para_control']
 used_parameters = p['da']['parameters']
 rain_control = p['da']['rain_control']
 used_raingrids = p['da']['raingrids']
@@ -151,24 +151,25 @@ for imember in range(nmember):
    #if os.path.isfile(output_file): continue
    # os.system('rm -rf *')
    # Read parameters
-   parameter_file = parameter_dir+'/para'+member[imember]
-   text_file = open(parameter_file, 'r')
-   for i in range(nparameter+rain_control):
-      if not parameter[i].used: continue
-      line = text_file.readline()
-      tmp = re.split('\t',line.strip())
-      nchar = tmp.count('')
-      for k in range(nchar): tmp.remove('')
-      n = int(tmp[1])
-      for j in range(n):
+   if para_control != 0:
+      parameter_file = parameter_dir+'/para'+member[imember]
+      text_file = open(parameter_file, 'r')
+      for i in range(nparameter+rain_control):
+         if not parameter[i].used: continue
          line = text_file.readline()
          tmp = re.split('\t',line.strip())
          nchar = tmp.count('')
          for k in range(nchar): tmp.remove('')
-         parameter[i].data[j] = float(tmp[1])
-      #if imember == 1: print(parameter[i].name, parameter[i].data[0])
-      if control == 1: parameter[i].data[1:] = parameter[i].data[0]
-   text_file.close()
+         n = int(tmp[1])
+         for j in range(n):
+            line = text_file.readline()
+            tmp = re.split('\t',line.strip())
+            nchar = tmp.count('')
+            for k in range(nchar): tmp.remove('')
+            parameter[i].data[j] = float(tmp[1])
+         #if imember == 1: print(parameter[i].name, parameter[i].data[0])
+         if para_control == 1: parameter[i].data[1:] = parameter[i].data[0]
+      text_file.close()
    
    # Write input
    input_file = forecast_dir+'/input'+member[imember]
@@ -196,33 +197,33 @@ for imember in range(nmember):
                grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
             inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
          else : inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
-
-   # Subcatchment
-   subcatchments = inp[SUBCATCHMENTS].keys()
-   for j,subcatchment in enumerate(subcatchments):
-      # print(inp[SUBCATCHMENTS][subcatchment])
-      # print(inp[SUBAREAS][subcatchment])
-      # print(inp[INFILTRATION][subcatchment])
-      for i in range(nparameter):
-         if parameter[i].name == 'Roughness': continue
-         elif parameter[i].name == 'Imperv': inp[SUBCATCHMENTS][subcatchment].imperviousness = parameter[i].data[j]
-         elif parameter[i].name == 'Slope': inp[SUBCATCHMENTS][subcatchment].slope = parameter[i].data[j]
-         elif parameter[i].name == 'N_Imperv': inp[SUBAREAS][subcatchment].n_imperv = parameter[i].data[j]
-         elif parameter[i].name == 'N_Perv': inp[SUBAREAS][subcatchment].n_perv = parameter[i].data[j]
-         elif parameter[i].name == 'S_Imperv': inp[SUBAREAS][subcatchment].storage_imperv = parameter[i].data[j]
-         elif parameter[i].name == 'S_Perv': inp[SUBAREAS][subcatchment].storage_perv = parameter[i].data[j]
-         elif parameter[i].name == 'PctZero': inp[SUBAREAS][subcatchment].pct_zero = parameter[i].data[j]
-         elif parameter[i].name == 'Ksat': inp[INFILTRATION][subcatchment].Ksat = parameter[i].data[j]
-         elif parameter[i].name == 'DryTime': inp[INFILTRATION][subcatchment].time_dry = parameter[i].data[j]
-         elif parameter[i].name == 'MaxRate': inp[INFILTRATION][subcatchment].rate_max = parameter[i].data[j]
-         elif parameter[i].name == 'MinRate': inp[INFILTRATION][subcatchment].rate_min = parameter[i].data[j]
-         elif parameter[i].name == 'Decay': inp[INFILTRATION][subcatchment].decay = parameter[i].data[j]
-   conduits = inp[CONDUITS].keys()
-   for j,conduit in enumerate(conduits):
-      #print(inp[CONDUITS][conduit])
-      for i in range(nparameter):
-         if j < nconduit and parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
-         elif j >= nconduit and parameter[i].name == 'S_Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j-nconduit]
+   if para_control != 0:
+      # Subcatchment
+      subcatchments = inp[SUBCATCHMENTS].keys()
+      for j,subcatchment in enumerate(subcatchments):
+         # print(inp[SUBCATCHMENTS][subcatchment])
+         # print(inp[SUBAREAS][subcatchment])
+         # print(inp[INFILTRATION][subcatchment])
+         for i in range(nparameter):
+            if parameter[i].name == 'Roughness': continue
+            elif parameter[i].name == 'Imperv': inp[SUBCATCHMENTS][subcatchment].imperviousness = parameter[i].data[j]
+            elif parameter[i].name == 'Slope': inp[SUBCATCHMENTS][subcatchment].slope = parameter[i].data[j]
+            elif parameter[i].name == 'N_Imperv': inp[SUBAREAS][subcatchment].n_imperv = parameter[i].data[j]
+            elif parameter[i].name == 'N_Perv': inp[SUBAREAS][subcatchment].n_perv = parameter[i].data[j]
+            elif parameter[i].name == 'S_Imperv': inp[SUBAREAS][subcatchment].storage_imperv = parameter[i].data[j]
+            elif parameter[i].name == 'S_Perv': inp[SUBAREAS][subcatchment].storage_perv = parameter[i].data[j]
+            elif parameter[i].name == 'PctZero': inp[SUBAREAS][subcatchment].pct_zero = parameter[i].data[j]
+            elif parameter[i].name == 'Ksat': inp[INFILTRATION][subcatchment].Ksat = parameter[i].data[j]
+            elif parameter[i].name == 'DryTime': inp[INFILTRATION][subcatchment].time_dry = parameter[i].data[j]
+            elif parameter[i].name == 'MaxRate': inp[INFILTRATION][subcatchment].rate_max = parameter[i].data[j]
+            elif parameter[i].name == 'MinRate': inp[INFILTRATION][subcatchment].rate_min = parameter[i].data[j]
+            elif parameter[i].name == 'Decay': inp[INFILTRATION][subcatchment].decay = parameter[i].data[j]
+      conduits = inp[CONDUITS].keys()
+      for j,conduit in enumerate(conduits):
+         #print(inp[CONDUITS][conduit])
+         for i in range(nparameter):
+            if j < nconduit and parameter[i].name == 'Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j]
+            elif j >= nconduit and parameter[i].name == 'S_Roughness': inp[CONDUITS][conduit].roughness = parameter[i].data[j-nconduit]
    inp.write_file(input_file)
    # to check
    # if not analysis_date == start_date:

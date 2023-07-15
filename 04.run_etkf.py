@@ -257,24 +257,25 @@ for i in range(1,nparameter+rain_control+1):
 pass
 
 # Read parameters
-for imember in range(nmember):
-   parameter_file = parameter_dir+'/para'+member[imember]
-   text_file = open(parameter_file, 'r')
-   for i in range(nparameter+rain_control):
-      if not parameter[i].used: continue
-      line = text_file.readline()
-      tmp = re.split('\t',line.strip())
-      nchar = tmp.count('')
-      for k in range(nchar): tmp.remove('')
-      n = int(tmp[1])
-      for j in range(n):
+if para_control != 0:
+   for imember in range(nmember):
+      parameter_file = parameter_dir+'/para'+member[imember]
+      text_file = open(parameter_file, 'r')
+      for i in range(nparameter+rain_control):
+         if not parameter[i].used: continue
          line = text_file.readline()
          tmp = re.split('\t',line.strip())
          nchar = tmp.count('')
          for k in range(nchar): tmp.remove('')
-         parameter[i].data[j,imember] = float(tmp[0])
-      # if imember == 1: print(parameter[i].name, parameter[i].data[0])
-   text_file.close()
+         n = int(tmp[1])
+         for j in range(n):
+            line = text_file.readline()
+            tmp = re.split('\t',line.strip())
+            nchar = tmp.count('')
+            for k in range(nchar): tmp.remove('')
+            parameter[i].data[j,imember] = float(tmp[0])
+         # if imember == 1: print(parameter[i].name, parameter[i].data[0])
+      text_file.close()
 pass
 
 # Parameter perturbations
