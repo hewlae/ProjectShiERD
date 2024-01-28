@@ -68,7 +68,8 @@ current_dir = os.getcwd()
 os.chdir(work_dir)
 if myid == 0 and not os.path.isdir(forecast_dir): 
    os.system('mkdir -p '+forecast_dir)
-   # os.system('ln -s '+rainfall_dir+'/*.dat '+forecast_dir)
+   if rain_control == 0:
+      os.system('ln -s '+rainfall_dir+'/*.dat '+forecast_dir)
 comm.Barrier()
 
 # Member
@@ -82,40 +83,41 @@ forecast_date = date.strftime('%Y%m%d%H%M')
 date += datetime.timedelta(minutes=1)
 end_date = date.strftime('%Y%m%d%H%M')
 
-# Rainfall 
-rg_file = const_dir+'/raingtog.json'
-json_file = open(rg_file, 'r')
-dic = json.load(json_file)
-json_file.close()
-rg_timeseries = {}
-ncycle = int(cycle/interval) # cycle/interval = 10/2 = 5
-cycledate = list(range(ncycle)) 
-nrain = int(cycle)
-raindate = list(range(nrain))
-date = datetime.datetime(int(analysis_date[:4]),int(analysis_date[4:6]),int(analysis_date[6:8]),int(analysis_date[8:10]),int(analysis_date[10:12]))
-for rg in dic.keys():
-   # -1. Create rainfall timeseries (every minutes)
-   for itime in range(nrain):
-      raindate[itime] = [date + datetime.timedelta(minutes=itime), float(0.0)]
-   # -2. Insert rainfall data if applicable
-   raw_files = []
-   for itime in range(ncycle):
-      cycledate[itime] = date + datetime.timedelta(minutes=itime*interval) 
-      raw_file = rg + '_' + cycledate[itime].strftime('%Y%m%d') + '.csv'
-      if raw_file not in raw_files: raw_files.append(raw_file)
-   for raw_file in raw_files:
-      if not os.path.isfile(rainfall_dir+'/'+raw_file): continue
-   text_file = open(rainfall_dir+'/'+raw_file,'r', encoding='utf-8')
-   line = text_file.readlines()
-   text_file.close()
-   for i in range(1,len(line)):
-      tmp = re.split(',', line[i].strip()) #.strip()
-      linedate = datetime.datetime(int(tmp[0][:4]),int(tmp[0][5:7]),int(tmp[0][8:10]),int(tmp[0][11:13]),int(tmp[0][14:16]))
-      if linedate > raindate[-1][0] or linedate < raindate[0][0] : continue
-      for i, t in enumerate(raindate):
-         if t[0] != linedate : continue
-         raindate[i][1] = float(tmp[1])
-   rg_timeseries[rg] = array(raindate)      
+# Rainfall
+if rain_control == 1:
+   rg_file = const_dir+'/raingtog.json'
+   json_file = open(rg_file, 'r')
+   dic = json.load(json_file)
+   json_file.close()
+   rg_timeseries = {}
+   ncycle = int(cycle/interval) # cycle/interval = 10/2 = 5
+   cycledate = list(range(ncycle)) 
+   nrain = int(cycle)
+   raindate = list(range(nrain))
+   date = datetime.datetime(int(analysis_date[:4]),int(analysis_date[4:6]),int(analysis_date[6:8]),int(analysis_date[8:10]),int(analysis_date[10:12]))
+   for rg in dic.keys():
+      # -1. Create rainfall timeseries (every minutes)
+      for itime in range(nrain):
+         raindate[itime] = [date + datetime.timedelta(minutes=itime), float(0.0)]
+      # -2. Insert rainfall data if applicable
+      raw_files = []
+      for itime in range(ncycle):
+         cycledate[itime] = date + datetime.timedelta(minutes=itime*interval) 
+         raw_file = rg + '_' + cycledate[itime].strftime('%Y%m%d') + '.csv'
+         if raw_file not in raw_files: raw_files.append(raw_file)
+      for raw_file in raw_files:
+         if not os.path.isfile(rainfall_dir+'/'+raw_file): continue
+      text_file = open(rainfall_dir+'/'+raw_file,'r', encoding='utf-8')
+      line = text_file.readlines()
+      text_file.close()
+      for i in range(1,len(line)):
+         tmp = re.split(',', line[i].strip()) #.strip()
+         linedate = datetime.datetime(int(tmp[0][:4]),int(tmp[0][5:7]),int(tmp[0][8:10]),int(tmp[0][11:13]),int(tmp[0][14:16]))
+         if linedate > raindate[-1][0] or linedate < raindate[0][0] : continue
+         for i, t in enumerate(raindate):
+            if t[0] != linedate : continue
+            raindate[i][1] = float(tmp[1])
+      rg_timeseries[rg] = array(raindate)      
 
 # Parameter
 parameter = []
@@ -144,7 +146,10 @@ for i in range(1,nparameter+rain_control+1):
 #sys.exit(0)
 
 # Run
-template_file = const_dir+'/input.txt'
+if rain_control == 0:
+   template_file = const_dir+'/input_polygon.txt'
+elif rain_control == 1:
+   template_file = const_dir+'/input_grid.txt'
 for imember in range(nmember):
    if imember%nprocessor != myid: continue
    output_file = forecast_dir+'/output'+member[imember]
@@ -189,14 +194,15 @@ for imember in range(nmember):
    else: inp[FILES]['USE HOTSTART'] = '"'+analysis_dir+'/state'+member[imember]+'"'
    inp[FILES]['SAVE HOTSTART'] = '"'+forecast_dir+'/state'+member[imember]+'"'
    # Rainfall
-   for rg, grids in dic.items():
-      for grid in grids:
-         if (rain_control == 1 and grid in used_raingrids) : 
-            grid_timeseries = rg_timeseries[rg]
-            for i in range(len(grid_timeseries)):
-               grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
-            inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
-         else : inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
+   if rain_control == 1:
+      for rg, grids in dic.items():
+         for grid in grids:
+            if (rain_control == 1 and grid in used_raingrids) : 
+               grid_timeseries = rg_timeseries[rg]
+               for i in range(len(grid_timeseries)):
+                  grid_timeseries[i][1] *= parameter[-1].data[used_raingrids.index(grid)]               
+               inp[TIMESERIES]['svri_{}'.format(grid)].data = array(grid_timeseries)
+            else : inp[TIMESERIES]['svri_{}'.format(grid)].data = array(rg_timeseries[rg])
    if para_control != 0:
       # Subcatchment
       subcatchments = inp[SUBCATCHMENTS].keys()
