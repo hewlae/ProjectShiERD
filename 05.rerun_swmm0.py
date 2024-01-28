@@ -50,6 +50,8 @@ work_dir = root_dir+'/work/work00'
 os.system('mkdir -p '+work_dir)
 current_dir = os.getcwd()
 os.chdir(work_dir)
+if rain_control == 0:
+   os.system('ln -s '+rainfall_dir+'/*.dat '+reanalysis_dir)
 
 # Member
 nmember = 1
