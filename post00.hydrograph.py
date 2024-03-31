@@ -8,6 +8,54 @@ import datetime
 import sys, os, re
 from swmm_api import read_out_file
 
+def plot_calibrated(graph_color, graph_width):
+    # Datetime
+    date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
+    analysis_date = date.strftime('%Y%m%d%H%M')
+    # Calibrated ver.(Pedersen et al.(2021)) is Bellinge 300
+    ex_no_cal = '100' # Gaussian : '100', Pareto : '200' or '300'
+    forecast_dir = root_dir+'/exp/'+experiment+ex_no_cal+'/forecast/'+analysis_date
+    while date < end_date:
+        output_file = forecast_dir+'/output00000000'
+        opt = read_out_file(output_file)
+        simulation_data = pd.DataFrame()
+        sim_value = pd.Series()
+        sim_value = opt.get_part('node',pp).depth
+        simulation_data[wg] = sim_value
+        if analysis_date == start_date: 
+            simflow = simulation_data
+        else:
+            simflow = pd.concat([simflow, simulation_data])
+        date += datetime.timedelta(minutes=cycle)
+        analysis_date = date.strftime('%Y%m%d%H%M')
+        forecast_dir = root_dir+'/exp/'+experiment+ex_no_cal+'/forecast/'+analysis_date
+    print(wg, pp, 'calbirated')
+    sns.lineplot(x = simflow.index, y = wg, data = simflow, color=graph_color, ax=ax1, linewidth=graph_width, linestyle='dashdot')
+
+def plot_modeled(graph_color, graph_width):
+    # Datetime
+    date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
+    analysis_date = date.strftime('%Y%m%d%H%M')
+    # Calibrated ver.(Pedersen et al.(2021)) is Bellinge 300
+    ex_no_cal = '113'
+    forecast_dir = root_dir+'/exp/'+experiment+ex_no_cal+'/forecast/'+analysis_date
+    while date < end_date:
+        output_file = forecast_dir+'/output00000000'
+        opt = read_out_file(output_file)
+        simulation_data = pd.DataFrame()
+        sim_value = pd.Series()
+        sim_value = opt.get_part('node',pp).depth
+        simulation_data[wg] = sim_value
+        if analysis_date == start_date: 
+            simflow = simulation_data
+        else:
+            simflow = pd.concat([simflow, simulation_data])
+        date += datetime.timedelta(minutes=cycle)
+        analysis_date = date.strftime('%Y%m%d%H%M')
+        forecast_dir = root_dir+'/exp/'+experiment+ex_no_cal+'/forecast/'+analysis_date
+    print(wg, pp, 'modeled')
+    sns.lineplot(x = simflow.index, y = wg, data = simflow, color=graph_color, ax=ax1, linewidth=graph_width, linestyle='dashdot')
+
 def plot_simgraph(imember, graph_color, graph_width):
     # Datetime
     date = datetime.datetime(int(start_date[:4]),int(start_date[4:6]),int(start_date[6:8]),int(start_date[8:10]),int(start_date[10:12]))
@@ -139,21 +187,16 @@ analysis_date = date.strftime('%Y%m%d%H%M')
 plt.rcParams.update({'figure.max_open_warning': 0})
 # for i,wg in enumerate(wg_dic):
 for wg,pp in wg_dic.items():
-    sns.set_style("whitegrid")
-    fig, ax1 = plt.subplots(figsize=(20,6))
-    ax2 = ax1.twinx()
-    sns.lineplot(x = rain_df.index, y= "rg5425", data = rain_df, color="blue", ax=ax2)
-    ax2.fill_between(rain_df.index, 0, rain_df["rg5425"],alpha = 0.8)
-    ax2.set(ylim=(0, 25))
-    ax2.set_ylabel("Rainfall [mm]", fontsize = '15')
-    ax2.invert_yaxis()
+    sns.set(font_scale=1.5)
+    sns.set_style("ticks", rc={"font.family": 'serif'})
+    fig, ax1 = plt.subplots(figsize=(24,6))
     ax1.set(ylim=(0, obsflow[wg].max()+0.7))
     ax1.set_ylabel("W.L : {} [m]".format(wg), fontsize = '15')
-    for imember in range(nmember):
-        plot_simgraph(imember, 'grey', 1)
-    sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", ax=ax1, linewidth=2)
+    # for imember in range(nmember):
+    #     plot_simgraph(imember, 'grey', 1)
+    sns.lineplot(x = obsflow.index, y= wg, data = obsflow, color="green", linestyle='dashdot', ax=ax1, linewidth=2)
+    plot_calibrated('magenta', 3) # calibrated benchmark
+    # plot_modeled('blue', 2)
     plot_simgraph(0, 'red', 2) # ensemble mean
-    legend_elements = [Line2D([0], [0], color='green', lw=4, label='observation'), Line2D([0], [0], color='red', lw=4, label='simulation')]
-    ax1.legend(handles=legend_elements, loc = 5, fontsize = '15')
-    plt.savefig(graph_dir+'/{}.png'.format(wg))
+    plt.savefig(graph_dir+'/hydro_{}.png'.format(wg))
     plt.clf()
