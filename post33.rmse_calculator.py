@@ -21,7 +21,7 @@ event_lst={'event1':{'analysis_date':'201206290000', 'end_date':'201207020000'},
            'event2-1':{'analysis_date':'201508310730', 'end_date':'201508310930'},
            'event2-2':{'analysis_date':'201508312000', 'end_date':'201508312200'},
            'event3':{'analysis_date':'201808110000', 'end_date':'201808120000'},
-           'event3-1':{'analysis_date':'201808111200', 'end_date':'201508311400'}}
+           'event3-1':{'analysis_date':'201808111200', 'end_date':'201808111400'}}
 
 analysis_date = event_lst[rain_event]['analysis_date']
 end_date = event_lst[rain_event]['end_date']
